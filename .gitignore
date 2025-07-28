@@ -1,0 +1,12 @@
+# Python関連
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+
+# VSCode設定など
+.vscode/
+
+# OSごとの不要ファイル
+.DS_Store
+Thumbs.db
