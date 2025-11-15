@@ -12,7 +12,7 @@ FastAPI + OpenAI API を活用したチャット＆PDF要約APIサーバーで�
 | バックエンド | FastAPI |
 | 機能 | - チャットAPI<br>- PDF要約API |
 | 外部API | OpenAI API |
-| フロントエンド | [next-fastapi-gpt（Vercel）](https://chat-summary-app.vercel.app) |
+| フロントエンド | [next-fastapi-gpt（Vercel）](https://chat-summary-app.vercel.app/chat) |
 | APIドキュメント | [Swagger UI](https://chat-summary-backend.onrender.com/docs) |
 
 ---
