@@ -62,7 +62,7 @@ uvicorn main:app --reload
 | 環境           | サービス   | URL                                                                                    |
 | ------------- | ------ | -------------------------------------------------------------------------------------- |
 | Backend (API) | Render | [https://chat-summary-backend.onrender.com](https://chat-summary-backend.onrender.com) |
-| Frontend      | Vercel | [https://chat-summary-app.vercel.app](https://chat-summary-app.vercel.app/chat)        |
+| Frontend      | Vercel | [https://chat-summary-app.vercel.app/chat](https://chat-summary-app.vercel.app/chat)   |
 
 ---
 
