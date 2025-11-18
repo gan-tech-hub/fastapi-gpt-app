@@ -90,6 +90,8 @@ fastapi-gpt-app/
 
 * 桜庭祐斗
 
+[GitHub - gan-tech-hub](https://github.com/gan-tech-hub)
+
 ---
 
 ## 📝 補足
