@@ -3,11 +3,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Dict
 import PyPDF2
+import time
 from io import BytesIO
 
 from services.api_response import error_response, success_response
 from services.openai_service import (
+    MAX_PDF_CHUNKS,
     OpenAIServiceError,
+    PDF_CHUNK_OVERLAP,
+    PDF_CHUNK_SIZE,
     generate_chat_response,
     generate_pdf_summary,
     generate_text_summary,
@@ -88,6 +92,7 @@ async def root():
 # GPTチャットエンドポイント
 @app.post("/chat")
 async def chat(request: ChatRequest):
+    start_time = time.perf_counter()
     message = request.history
     mode = request.mode  # + mode取り出し
 
@@ -114,19 +119,41 @@ async def chat(request: ChatRequest):
         print(e)
         return error_response("OPENAI_API_ERROR", str(e), status_code=502)
 
-    return success_response(ai_message)
+    elapsed_ms = int((time.perf_counter() - start_time) * 1000)
+    return success_response(
+        ai_message,
+        meta={
+            "mode": mode,
+            "elapsed_ms": elapsed_ms,
+        },
+    )
 
 # PDF要約エンドポイント
 @app.post("/pdf-summary")
 async def pdf_summary(file: UploadFile = File(...)):
+    start_time = time.perf_counter()
     try:
         contents = await read_pdf_file_with_limit(file)
         text = extract_pdf_text_with_limit(contents)
         if not text.strip():
             return error_response("PDF_TEXT_NOT_FOUND", "PDFからテキストを抽出できませんでした。")
 
-        summary = generate_pdf_summary(text)
-        return success_response(summary)
+        result = generate_pdf_summary(text)
+        elapsed_ms = int((time.perf_counter() - start_time) * 1000)
+        return success_response(
+            result.summary,
+            meta={
+                "mode": "pdf-summary",
+                "elapsed_ms": elapsed_ms,
+                "file_size_bytes": len(contents),
+                "extracted_text_chars": len(text),
+                "chunk_count": result.chunk_count,
+                "max_chunks": MAX_PDF_CHUNKS,
+                "chunk_size": PDF_CHUNK_SIZE,
+                "chunk_overlap": PDF_CHUNK_OVERLAP,
+                "openai_call_count": result.openai_call_count,
+            },
+        )
 
     except PDFProcessingError as e:
         print(e)

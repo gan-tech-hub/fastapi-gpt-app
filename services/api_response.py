@@ -1,12 +1,20 @@
 from fastapi.responses import JSONResponse
 
 
-def success_response(message: str, status_code: int = 200) -> JSONResponse:
+def success_response(
+    message: str,
+    status_code: int = 200,
+    meta: dict | None = None,
+) -> JSONResponse:
+    data = {"message": message}
+    if meta is not None:
+        data["meta"] = meta
+
     return JSONResponse(
         status_code=status_code,
         content={
             "success": True,
-            "data": {"message": message},
+            "data": data,
             "error": None,
         },
     )
