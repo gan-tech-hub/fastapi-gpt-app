@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import os
 from typing import Dict, List, Optional
 
@@ -21,6 +22,13 @@ client: Optional[OpenAI] = None
 
 class OpenAIServiceError(Exception):
     pass
+
+
+@dataclass
+class PDFSummaryResult:
+    summary: str
+    chunk_count: int
+    openai_call_count: int
 
 
 def get_client() -> OpenAI:
@@ -64,7 +72,7 @@ def generate_text_summary(messages: List[Dict[str, str]]) -> str:
     return create_chat_completion(summary_messages)
 
 
-def generate_pdf_summary(text: str) -> str:
+def generate_pdf_summary(text: str) -> PDFSummaryResult:
     chunks = split_text_into_chunks(
         text,
         chunk_size=PDF_CHUNK_SIZE,
@@ -84,9 +92,18 @@ def generate_pdf_summary(text: str) -> str:
     ]
 
     if len(partial_summaries) == 1:
-        return partial_summaries[0]
+        return PDFSummaryResult(
+            summary=partial_summaries[0],
+            chunk_count=len(chunks),
+            openai_call_count=1,
+        )
 
-    return generate_integrated_pdf_summary(partial_summaries)
+    integrated_summary = generate_integrated_pdf_summary(partial_summaries)
+    return PDFSummaryResult(
+        summary=integrated_summary,
+        chunk_count=len(chunks),
+        openai_call_count=len(chunks) + 1,
+    )
 
 
 def generate_partial_pdf_summary(chunk: str, index: int, total: int) -> str:
