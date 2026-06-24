@@ -1,5 +1,6 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import List, Dict
 import PyPDF2
@@ -88,6 +89,19 @@ def extract_pdf_text_with_limit(contents: bytes) -> str:
 @app.get("/")
 async def root():
     return success_response("FastAPI with OpenAI is working!")
+
+
+@app.get("/health")
+async def health():
+    return JSONResponse(
+        content={
+            "success": True,
+            "data": {
+                "status": "ok",
+            },
+            "error": None,
+        },
+    )
 
 # GPTチャットエンドポイント
 @app.post("/chat")
